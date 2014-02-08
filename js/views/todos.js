@@ -15,15 +15,19 @@ app.TodoView = Backbone.View.extend({
 	
 	events: {
 		'click .destroy': 'clear',
+		'click .toggle': 'togglecompleted',
 		// NEW
-		'click .toggle': 'togglecompleted' 		
+		'dblclick label': 'edit',
+		// NEW
+		'keypress .edit': 'updateOnEnter',
+		// NEW
+		'blur .edit': 'close'		
 	},
 
 	// The TodoView listens for changes to its model, re-rendering. Since there's
 	// a one-to-one correspondence between a **Todo** and a **TodoView** in this
 	// app, we set a direct reference on the model for convenience.
 	initialize: function() {
-		//NEW
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
 	},
@@ -31,12 +35,41 @@ app.TodoView = Backbone.View.extend({
 	// Re-render the titles of the todo item.
 	render: function() {
 		this.$el.html( this.template( this.model.toJSON() ) );
-		//NEW
-		this.$el.toggleClass( 'completed', this.model.get('completed') ); // NEW
+		this.$el.toggleClass( 'completed', this.model.get('completed') );  
+		// NEW
+		this.$input = this.$('.edit');
 		return this;
 	},
 	
-	// NEW - Toggle the `"completed"` state of the model.
+	// NEW
+	// Switch this view into `"editing"` mode, displaying the input field.
+	edit: function() {
+		this.$el.addClass('editing');
+		this.$input.focus();
+	},
+
+	// NEW
+	// Close the `"editing"` mode, saving changes to the todo.
+	close: function() {
+		var value = this.$input.val().trim();
+
+		if ( value ) {
+			this.model.save({ title: value });
+		} 
+		else {
+			this.clear();
+		}
+		this.$el.removeClass('editing');
+	},
+	
+	// NEW -  If you hit `enter`, we're through editing the item.
+	updateOnEnter: function( e ) {
+		if ( e.which === ENTER_KEY ) {
+			this.close();
+		}
+	},
+	
+	// Toggle the `"completed"` state of the model.
 	togglecompleted: function() {
 		this.model.toggle();
 	},
