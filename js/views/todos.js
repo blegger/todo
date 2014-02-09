@@ -16,11 +16,8 @@ app.TodoView = Backbone.View.extend({
 	events: {
 		'click .destroy': 'clear',
 		'click .toggle': 'togglecompleted',
-		// NEW
 		'dblclick label': 'edit',
-		// NEW
 		'keypress .edit': 'updateOnEnter',
-		// NEW
 		'blur .edit': 'close'		
 	},
 
@@ -36,19 +33,16 @@ app.TodoView = Backbone.View.extend({
 	render: function() {
 		this.$el.html( this.template( this.model.toJSON() ) );
 		this.$el.toggleClass( 'completed', this.model.get('completed') );  
-		// NEW
 		this.$input = this.$('.edit');
 		return this;
 	},
 	
-	// NEW
 	// Switch this view into `"editing"` mode, displaying the input field.
 	edit: function() {
 		this.$el.addClass('editing');
 		this.$input.focus();
 	},
 
-	// NEW
 	// Close the `"editing"` mode, saving changes to the todo.
 	close: function() {
 		var value = this.$input.val().trim();
@@ -62,7 +56,7 @@ app.TodoView = Backbone.View.extend({
 		this.$el.removeClass('editing');
 	},
 	
-	// NEW -  If you hit `enter`, we're through editing the item.
+	// If you hit `enter`, we're through editing the item.
 	updateOnEnter: function( e ) {
 		if ( e.which === ENTER_KEY ) {
 			this.close();

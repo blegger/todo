@@ -12,10 +12,11 @@ app.AppView = Backbone.View.extend({
 	// the App already present in the HTML.
 	el: '#todoapp',
 
-	// New
 	// Delegated events for creating new items, and clearing completed ones.
 	events: {
-		'keypress #new-todo': 'createOnEnter'
+		'keypress #new-todo': 'createOnEnter',
+		// New
+		'click #toggle-all': 'toggleAllComplete'
 	},
 
 	// At initialization we bind to the relevant events on the `Todos`
@@ -25,6 +26,8 @@ app.AppView = Backbone.View.extend({
 		this.$input = this.$('#new-todo');
 		this.$footer = this.$('#footer');
 		this.$main = this.$('#main');
+		//New
+		this.allCheckbox = this.$('#toggle-all')[0];
 
 		this.listenTo(app.Todos, 'add', this.addOne);
 		app.Todos.fetch();
@@ -56,4 +59,15 @@ app.AppView = Backbone.View.extend({
 		app.Todos.create( this.newAttributes() );
 		this.$input.val('');
 	},
+	
+	// New
+	toggleAllComplete: function() {
+		var completed = this.allCheckbox.checked;
+
+		app.Todos.each(function( todo ) {
+			todo.save({
+			  'completed': completed
+			});
+		});
+	}
 });
