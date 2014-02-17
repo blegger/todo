@@ -27,12 +27,16 @@ app.TodoView = Backbone.View.extend({
 	initialize: function() {
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
+		// NEW
+		this.listenTo(this.model, 'visible', this.toggleVisible);
 	},
 	
 	// Re-render the titles of the todo item.
 	render: function() {
 		this.$el.html( this.template( this.model.toJSON() ) );
-		this.$el.toggleClass( 'completed', this.model.get('completed') );  
+		this.$el.toggleClass( 'completed', this.model.get('completed') ); 
+		// NEW
+		this.toggleVisible(); 		
 		this.$input = this.$('.edit');
 		return this;
 	},
@@ -71,5 +75,21 @@ app.TodoView = Backbone.View.extend({
 	// Remove the item, destroy the model from *localStorage* and delete its view.
 	clear: function() {
 		this.model.destroy();
+	},
+	
+	// NEW
+	// Toggles visibility of item
+	toggleVisible : function () {
+		this.$el.toggleClass( 'hidden',  this.isHidden());
+	},
+
+	// NEW
+	// Determines if item should be hidden
+	isHidden : function () {
+		var isCompleted = this.model.get('completed');
+		return ( // hidden cases only
+			(!isCompleted && app.TodoFilter === 'completed')
+			|| (isCompleted && app.TodoFilter === 'active')
+		);
 	}
 });
